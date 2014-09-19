@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import timedelta
-from openerp import models, fields, api, exceptions
+from openerp import models, fields, api, exceptions, _
 
 # class openacademy(models.Model):
 #     _name = 'openacademy.openacademy'
@@ -24,11 +24,11 @@ class Course(models.Model):
         default = dict(default or {})
 
         copied_count = self.search_count(
-            [('name', '=like', u"Copy of {}%".format(self.name))])
+            [('name', '=like', _(u"Copy of {}%".format(self.name)))])
         if not copied_count:
-            new_name = u"Copy of {}".format(self.name)
+            new_name = _(u"Copy of {}".format(self.name))
         else:
-            new_name = u"Copy of {} ({})".format(self.name, copied_count)
+            new_name = _(u"Copy of {} ({})".format(self.name, copied_count))
 
         default['name'] = new_name
         return super(Course, self).copy(default)
@@ -101,22 +101,22 @@ class Session(models.Model):
         if self.seats < 0:
             return {
                 'warning': {
-                    'title': "Incorrect 'seats' value",
-                    'message': "The number of available seats may not be negtive",
+                    'title': _("Incorrect 'seats' value"),
+                    'message': _("The number of available seats may not be negtive"),
                 },
             }
         if self.seats < len(self.attendee_ids):
             return {
                 'warning': {
-                    'title': "Too many attendees",
-                    'message': "Increase seats or remove excess attendees",
+                    'title': _("Too many attendees"),
+                    'message': _("Increase seats or remove excess attendees"),
                 },
             }
     @api.one
     @api.constrains('instructor_id', 'attendee_ids')
     def _check_instructor_not_in_attendees(self):
         if self.instructor_id and self.instructor_id in self.attendee_ids:
-            raise exceptions.ValidationError("A session's instructor can't be an attendee")
+            raise exceptions.ValidationError(_("A session's instructor can't be an attendee"))
 
     @api.one
     @api.depends('start_date', 'duration')
